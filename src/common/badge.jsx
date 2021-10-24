@@ -1,8 +1,7 @@
 import React from "react";
 
-function Badge ({ name, value }) {
-    console.log("Badge is rendered");
-  return <span className={name}>{value}</span>;
-};
+function Badge({ name, value }) {
+  return value === 0 ? null : <span className={name}>{value}</span>;
+}
 
 export default Badge;

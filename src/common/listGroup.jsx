@@ -6,7 +6,8 @@ const ListGroup = ({
   textProperty,
   valueProperty,
   selectedItem,
-  onItemSelect
+  onItemSelect,
+  reports,
 }) => {
   const classNameList =
     "list-group-item d-flex justify-content-between align-items-center";
@@ -28,7 +29,7 @@ const ListGroup = ({
                 ? classNameBadge + " bg-warning text-dark"
                 : classNameBadge + " bg-primary"
             }
-            value="14"
+            value={reports.filter((r) => r.defectId === item[valueProperty]).length}
           />
         </li>
       ))}
