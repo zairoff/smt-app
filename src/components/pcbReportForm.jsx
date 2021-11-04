@@ -1,18 +1,12 @@
 import React, { Component } from "react";
-import { Alert } from "react-alert";
 import ListGroup from "../common/listGroup";
 import Select from "../common/select";
 import ButtonBadge from "../common/buttonBadge";
-import axios from "axios";
-
-const apiProduct = "https://localhost:44353/api/Product";
-const apiBrand = "https://localhost:44353/api/ProductBrand";
-const apiModel = "https://localhost:44353/api/Model/";
-const apiPosition = "https://localhost:44353/api/PcbPosition";
-const apiDefects = "https://localhost:44353/api/Defect";
-const apiReport = "https://localhost:44353/api/PcbReport";
-
-//axios.defaults.headers.post["Content-Type"] = "application/json";
+import httpService from "../services/httpService";
+import { apiUrl } from "../config.json"
+import { getProducts } from "../services/productService";
+import { getPositions } from "../services/positionService";
+import { getDefects } from "../services/defectService";
 
 class PcbReportForm extends Component {
   state = {
@@ -28,16 +22,10 @@ class PcbReportForm extends Component {
     selectedListItem: null,
   };
 
-  callApi = async (url) => {
-    const { data } = await axios.get(url);
-    return data;
-  };
-
   async componentDidMount() {
-    //console.log("starting timer...", new Date().toJSON().slice(0,10).replace(/-/g,'-'));
-    const { data: products } = await axios.get(apiProduct);
-    const { data: positions } = await axios.get(apiPosition);
-    const { data: defects } = await axios.get(apiDefects);
+    const { data: products } = await getProducts();
+    const { data: positions } = await getPositions();
+    const { data: defects } = await getDefects();
     this.setState({ products, positions, defects });
   }
 
@@ -54,20 +42,22 @@ class PcbReportForm extends Component {
       defectId: selectedListItem.id,
       pcbPositionId: positionId,
     };
-    const { status: status } = await axios.post(apiReport, obj);
+    const { status: status } = await httpService.post(apiUrl + "/PcbReport", obj);
     if (status === 201) {
-      this.state.reports = await this.callApi(
-        apiReport +
-          "/GetByDateAndModelIdAsync?modelId=" +
-          this.state.selectedModel +
-          "&date=" +
-          new Date().toJSON().slice(0, 10).replace(/-/g, "-")
+      const { data } = await httpService.get(
+        apiUrl +
+        "/PcbReport/GetByDateAndModelIdAsync?modelId=" +
+        this.state.selectedModel +
+        "&date=" +
+        new Date().toJSON().slice(0, 10).replace(/-/g, "-")
       );
+      this.state.reports = data;
       this.setState(this.state.reports);
     }
   };
 
   handleSelectChange = async (target) => {
+    let data = null;
     switch (target.name) {
       case "Product":
         this.state.selectedProduct = target.value;
@@ -76,12 +66,13 @@ class PcbReportForm extends Component {
         this.state.brands = [];
         this.state.models = [];
         this.state.reports = [];
+
         if (target.value) {
-          this.state.brands = await this.callApi(
-            apiBrand +
-              "/GetByProductIdAsync?productId=" +
-              this.state.selectedProduct
-          );
+          ({ data } = await httpService.get(
+            apiUrl + "/ProductBrand/GetByProductIdAsync?productId=" +
+            this.state.selectedProduct
+          ));
+          this.state.brands = data;
         }
         this.setState(this.state.brands);
         break;
@@ -91,25 +82,28 @@ class PcbReportForm extends Component {
         this.state.models = [];
         this.state.reports = [];
         if (target.value) {
-          this.state.models = await this.callApi(
-            apiModel +
-              "GetByProductBrandId?productBrandId=" +
-              this.state.selectedBrand
-          );
+          ({ data } = await httpService.get(
+            apiUrl +
+            "/Model/GetByProductBrandId?productBrandId=" +
+            this.state.selectedBrand
+          ));
+          this.state.models = data;
         }
+
         this.setState(this.state.models);
         break;
       case "Model":
         this.state.selectedModel = target.value;
         this.state.reports = [];
         if (target.value) {
-          this.state.reports = await this.callApi(
-            apiReport +
-              "/GetByDateAndModelIdAsync?modelId=" +
-              this.state.selectedModel +
-              "&date=" +
-              new Date().toJSON().slice(0, 10).replace(/-/g, "-")
-          );
+          ({ data } = await httpService.get(
+            apiUrl +
+            "/PcbReport/GetByDateAndModelIdAsync?modelId=" +
+            this.state.selectedModel +
+            "&date=" +
+            new Date().toJSON().slice(0, 10).replace(/-/g, "-")
+          ));
+          this.state.reports = data;
         }
         this.setState(this.state.reports);
         break;
