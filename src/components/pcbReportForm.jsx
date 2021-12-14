@@ -3,7 +3,7 @@ import ListGroup from "../common/listGroup";
 import Select from "../common/select";
 import ButtonBadge from "../common/buttonBadge";
 import httpService from "../services/httpService";
-import { apiUrl } from "../config.json"
+import { apiUrl } from "../config.json";
 import { getProducts } from "../services/productService";
 import { getPositions } from "../services/positionService";
 import { getDefects } from "../services/defectService";
@@ -42,14 +42,17 @@ class PcbReportForm extends Component {
       defectId: selectedListItem.id,
       pcbPositionId: positionId,
     };
-    const { status: status } = await httpService.post(apiUrl + "/PcbReport", obj);
+    const { status: status } = await httpService.post(
+      apiUrl + "/PcbReport",
+      obj
+    );
     if (status === 201) {
       const { data } = await httpService.get(
         apiUrl +
-        "/PcbReport/GetByDateAndModelIdAsync?modelId=" +
-        this.state.selectedModel +
-        "&date=" +
-        new Date().toJSON().slice(0, 10).replace(/-/g, "-")
+          "/PcbReport/GetByDateAndModelIdAsync?modelId=" +
+          this.state.selectedModel +
+          "&date=" +
+          new Date().toJSON().slice(0, 10).replace(/-/g, "-")
       );
       this.state.reports = data;
       this.setState(this.state.reports);
@@ -69,8 +72,9 @@ class PcbReportForm extends Component {
 
         if (target.value) {
           ({ data } = await httpService.get(
-            apiUrl + "/ProductBrand/GetByProductIdAsync?productId=" +
-            this.state.selectedProduct
+            apiUrl +
+              "/ProductBrand/GetByProductIdAsync?productId=" +
+              this.state.selectedProduct
           ));
           this.state.brands = data;
         }
@@ -84,8 +88,8 @@ class PcbReportForm extends Component {
         if (target.value) {
           ({ data } = await httpService.get(
             apiUrl +
-            "/Model/GetByProductBrandId?productBrandId=" +
-            this.state.selectedBrand
+              "/Model/GetByProductBrandId?productBrandId=" +
+              this.state.selectedBrand
           ));
           this.state.models = data;
         }
@@ -98,10 +102,10 @@ class PcbReportForm extends Component {
         if (target.value) {
           ({ data } = await httpService.get(
             apiUrl +
-            "/PcbReport/GetByDateAndModelIdAsync?modelId=" +
-            this.state.selectedModel +
-            "&date=" +
-            new Date().toJSON().slice(0, 10).replace(/-/g, "-")
+              "/PcbReport/GetByDateAndModelIdAsync?modelId=" +
+              this.state.selectedModel +
+              "&date=" +
+              new Date().toJSON().slice(0, 10).replace(/-/g, "-")
           ));
           this.state.reports = data;
         }
@@ -124,7 +128,6 @@ class PcbReportForm extends Component {
         <div className="row p-2">
           <div className="col">
             <Select
-              name="Product"
               label="Product"
               items={products}
               onChange={this.handleSelectChange}
@@ -132,7 +135,6 @@ class PcbReportForm extends Component {
           </div>
           <div className="col">
             <Select
-              name="Brand"
               label="Brand"
               items={brands}
               onChange={this.handleSelectChange}
@@ -140,7 +142,6 @@ class PcbReportForm extends Component {
           </div>
           <div className="col">
             <Select
-              name="Model"
               label="Model"
               items={models}
               onChange={this.handleSelectChange}
